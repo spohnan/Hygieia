@@ -1,0 +1,159 @@
+version: '2'
+services:
+
+  hygieia-ui:
+    image: demo-hygieia-ui
+    container_name: hygieia-ui
+    ports:
+      - "80:80"
+    networks:
+      - devnet
+    depends_on:
+      - hygieia-api
+
+  hygieia-api:
+    image: demo-hygieia-api
+    container_name: hygieia-api
+    ports:
+      - "8080:8080"
+    networks:
+      - devnet
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=dashboard
+      - SPRING_DATA_MONGODB_USERNAME=dashboarduser
+      - SPRING_DATA_MONGODB_PASSWORD=dbpassword
+      - AUTH_SECRET=dd4a271e27feb018e76b6f42b73115507b16d6c0
+    depends_on:
+      - mongodb
+
+  hygieia-jenkins-build-collector:
+    image: demo-jenkins-collector
+    container_name: jenkins-collector
+    networks:
+      - devnet
+    environment:
+      - JENKINS_MASTER=http://jenkins:8080
+      - JENKINS_CRON=0 0/2 * * * *
+      - MONGODB_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGODB_PORT=27017
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
+    depends_on:
+      - jenkins
+      - mongodb
+  
+  hygieia-sonar-build-collector:
+    image: demo-sonar-collector
+    container_name: sonar-collector
+    networks:
+      - devnet
+    environment:
+      - SONAR_URL=http://sonarqube:9000
+      - SONAR_CRON=0 0/2 * * * *
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
+    depends_on:
+      - sonarqube
+      - mongodb
+
+  hygieia-gitlab-build-collector:
+    image: demo-gitlab-collector
+    container_name: gitlab-collector
+    networks:
+      - devnet
+    environment:
+      - GITLAB_HOST=gitlab
+      - GITLAB_CRON=0 0/2 * * * *
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
+    depends_on:
+      - gitlab
+      - mongodb
+
+  jenkins:
+    image: demo-jenkins
+    container_name: jenkins
+    ports:
+      - "9001:8080"
+    networks:
+      - devnet
+    environment:
+      - JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+  sonarqube:
+    image: sonarqube:alpine
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - devnet
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://postgres:5432/sonar
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+    depends_on:
+      - postgres
+
+  gitlab:
+    image: gitlab/gitlab-ce
+    container_name: gitlab
+    networks:
+      - devnet
+    ports:
+      - 443:443
+      - 81:80
+      - 22:22
+    volumes:
+      - gitlab_conf:/etc/gitlab
+      - gitlab_data:/var/opt/gitlab
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    networks:
+      - devnet
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: demo-mongo
+    container_name: mongodb
+    command: mongod --smallfiles
+    ports:
+     - "27017:27017"
+    networks:
+      - devnet
+    volumes:
+     - mongo_data:/data/db
+
+networks:
+  devnet:
+    driver: bridge
+
+volumes:
+  gitlab_conf:
+  gitlab_data:
+  jenkins_home:
+  mongo_data:
+  postgresql:
+  postgresql_data:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_bundled-plugins:
