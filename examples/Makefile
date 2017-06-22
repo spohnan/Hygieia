@@ -29,7 +29,6 @@ clean: stop
 
 start: .init.lock
 	@docker-compose up -d
-	$(MAKE) logs
 
 stop:
 	@docker-compose down
