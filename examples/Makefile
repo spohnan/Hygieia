@@ -25,7 +25,7 @@ PHONY: binaries clean containers containers-only logs start stop
 	@docker-compose restart jenkins
 
 clean: stop
-	@echo y | docker system prune
+	@docker system prune
 	@rm -f .init.lock
 
 start: .init.lock
