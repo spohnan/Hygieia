@@ -1,3 +1,0 @@
-git-client:latest
-git:latest
-git-server:latest
