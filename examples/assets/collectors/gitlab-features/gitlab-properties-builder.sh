@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # mongo container provides the HOST/PORT
 # api container provided DB Name, ID & PWD
