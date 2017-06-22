@@ -1,13 +1,14 @@
 #
 # Usage: If starting from a fresh checkout then run make containers
 #
-API_IMAGE_NAME               := demo-hygieia-api
-UI_IMAGE_NAME                := demo-hygieia-ui
-MONGO_IMAGE_NAME             := demo-mongo
-JENKINS_IMAGE_NAME           := demo-jenkins
-JENKINS_IMAGE_COLLECTOR_NAME := demo-jenkins-collector
-SONAR_IMAGE_COLLECTOR_NAME   := demo-sonar-collector
-GITLAB_IMAGE_COLLECTOR_NAME  := demo-gitlab-collector
+API_IMAGE_NAME                        := demo-hygieia-api
+UI_IMAGE_NAME                         := demo-hygieia-ui
+MONGO_IMAGE_NAME                      := demo-mongo
+JENKINS_IMAGE_NAME                    := demo-jenkins
+JENKINS_IMAGE_COLLECTOR_NAME          := demo-jenkins-collector
+SONAR_IMAGE_COLLECTOR_NAME            := demo-sonar-collector
+GITLAB_SCM_IMAGE_COLLECTOR_NAME       := demo-gitlab-scm-collector
+GITLAB_FEATURES_IMAGE_COLLECTOR_NAME  := demo-gitlab-features-collector
 
 ROOT_DIR  := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 BUILD_DIR := ${ROOT_DIR}/build
@@ -47,6 +48,7 @@ binaries:
 			cp -r UI/dist /tmp/build/html && \
 			cp api/target/api.jar /tmp/build && \
 			cp collectors/scm/gitlab/target/gitlab-scm-collector*.jar /tmp/build && \
+			cp collectors/feature/gitlab/target/gitlab-feature-collector*.jar /tmp/build && \
 			cp collectors/build/jenkins/target/jenkins-build-collector*.jar /tmp/build && \
 			cp collectors/build/sonar/target/sonar-codequality-collector*.jar /tmp/build"
 
@@ -59,7 +61,8 @@ containers-only:
 	@docker build . --rm -t ${JENKINS_IMAGE_NAME} -f assets/jenkins/Dockerfile
 	@docker build . --rm -t ${JENKINS_IMAGE_COLLECTOR_NAME} -f assets/collectors/jenkins/Dockerfile
 	@docker build . --rm -t ${SONAR_IMAGE_COLLECTOR_NAME} -f assets/collectors/sonarqube/Dockerfile
-	@docker build . --rm -t ${GITLAB_IMAGE_COLLECTOR_NAME} -f assets/collectors/gitlab/Dockerfile
+	@docker build . --rm -t ${GITLAB_SCM_IMAGE_COLLECTOR_NAME} -f assets/collectors/gitlab-scm/Dockerfile
+	@docker build . --rm -t ${GITLAB_FEATURES_IMAGE_COLLECTOR_NAME} -f assets/collectors/gitlab-features/Dockerfile
 
 logs:
-	docker-compose logs --tail="all" --follow hygieia-api hygieia-ui jenkins mongodb postgres sonarqube hygieia-jenkins-build-collector hygieia-sonar-build-collector
+	docker-compose logs --follow --tail="all"

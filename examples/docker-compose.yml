@@ -61,13 +61,29 @@ services:
       - sonarqube
       - mongodb
 
-  hygieia-gitlab-build-collector:
-    image: demo-gitlab-collector
-    container_name: gitlab-collector
+  hygieia-gitlab-scm-collector:
+    image: demo-gitlab-scm-collector
+    container_name: gitlab-scm-collector
     networks:
       - devnet
     environment:
-      - GITLAB_HOST=gitlab
+      - GITLAB_HOST=gitlab:81
+      - GITLAB_CRON=0 0/2 * * * *
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
+      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
+    depends_on:
+      - gitlab
+      - mongodb
+
+  hygieia-gitlab-features-collector:
+    image: demo-gitlab-features-collector
+    container_name: gitlab-features-collector
+    networks:
+      - devnet
+    environment:
+      - GITLAB_HOST=gitlab:81
       - GITLAB_CRON=0 0/2 * * * *
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
