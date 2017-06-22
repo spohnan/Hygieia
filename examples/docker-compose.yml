@@ -67,7 +67,7 @@ services:
     networks:
       - devnet
     environment:
-      - GITLAB_HOST=gitlab:81
+      - GITLAB_HOST=gitlab
       - GITLAB_CRON=0 0/2 * * * *
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017

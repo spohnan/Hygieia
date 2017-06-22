@@ -6,6 +6,7 @@
 echo "MONGODB_HOST: $MONGODB_HOST"
 echo "MONGODB_PORT: $MONGODB_PORT"
 
+PROP_FILE=hygieia-gitlab-features-collector.properties
 
 cat > $PROP_FILE <<EOF
 #Database Name
