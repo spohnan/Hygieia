@@ -18,12 +18,9 @@ services:
       - "8080:8080"
     networks:
       - devnet
+    env_file:
+        - database.env
     environment:
-      - SPRING_DATA_MONGODB_HOST=mongodb
-      - SPRING_DATA_MONGODB_PORT=27017
-      - SPRING_DATA_MONGODB_DATABASE=dashboard
-      - SPRING_DATA_MONGODB_USERNAME=dashboarduser
-      - SPRING_DATA_MONGODB_PASSWORD=dbpassword
       - AUTH_SECRET=dd4a271e27feb018e76b6f42b73115507b16d6c0
     depends_on:
       - mongodb
@@ -33,14 +30,11 @@ services:
     container_name: jenkins-collector
     networks:
       - devnet
+    env_file:
+      - database.env
     environment:
       - JENKINS_MASTER=http://jenkins:8080
       - JENKINS_CRON=0 0/2 * * * *
-      - MONGODB_HOST=mongodb
-      - MONGO_PORT=27017
-      - MONGODB_PORT=27017
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
     depends_on:
       - jenkins
       - mongodb
@@ -50,13 +44,11 @@ services:
     container_name: sonar-collector
     networks:
       - devnet
+    env_file:
+      - database.env
     environment:
       - SONAR_URL=http://sonarqube:9000
       - SONAR_CRON=0 0/2 * * * *
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
     depends_on:
       - sonarqube
       - mongodb
@@ -66,13 +58,11 @@ services:
     container_name: gitlab-scm-collector
     networks:
       - devnet
+    env_file:
+      - database.env
     environment:
       - GITLAB_HOST=gitlab
       - GITLAB_CRON=0 0/2 * * * *
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
     depends_on:
       - gitlab
       - mongodb
@@ -82,13 +72,11 @@ services:
     container_name: gitlab-features-collector
     networks:
       - devnet
+    env_file:
+      - database.env
     environment:
       - GITLAB_HOST=gitlab
       - GITLAB_CRON=0 0/2 * * * *
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_USERNAME=dashboarduser
-      - HYGIEIA_API_ENV_SPRING_DATA_MONGODB_PASSWORD=dbpassword
     depends_on:
       - gitlab
       - mongodb

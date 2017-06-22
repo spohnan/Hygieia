@@ -1,16 +1,5 @@
 #!/bin/sh
 
-# if we are linked, use that info
-if [ "$MONGO_PORT" != "" ]; then
-  # Sample: MONGO_PORT=tcp://172.17.0.20:27017
-  export SPRING_DATA_MONGODB_HOST=`echo $MONGO_PORT|sed 's;.*://\([^:]*\):\(.*\);\1;'`
-  export SPRING_DATA_MONGODB_PORT=`echo $MONGO_PORT|sed 's;.*://\([^:]*\):\(.*\);\2;'`
-fi
-
-echo "SPRING_DATA_MONGODB_HOST: $SPRING_DATA_MONGODB_HOST"
-echo "SPRING_DATA_MONGODB_PORT: $SPRING_DATA_MONGODB_PORT"
-
-
 cat > dashboard.properties <<EOF
 #Database Name - default is test
 dbname=${SPRING_DATA_MONGODB_DATABASE:-dashboard}
